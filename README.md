@@ -18,7 +18,7 @@
 - [FAQ](doc/RocksDB-FAQ.md)
 - [术语](doc/Terminology.md) 
 - 开发者指南
-	- [基本操作](doc/Basic-Operations.md)
+- [基本操作](doc/Basic-Operations.md)
 		- [迭代器](doc/iterator.md)
 		- [前缀搜索](doc/Prefix-seek.md)
 		- [向前搜索](doc/SeekForPrev.md)
