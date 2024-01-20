@@ -201,7 +201,7 @@ level风格压缩在某些场景会有很高的写放大。对于写多的场景
 
 # 写失速
 
-参考[写失速](https://rocksdb.org.cn/doc/Write-Stalls.html)了解更多细节
+参考[写失速](https://wanghenshui.github.io/rocksdb-doc-cn/doc/Write-Stalls.html)了解更多细节
 
 # 前缀数据库
 
@@ -215,7 +215,7 @@ RocksDB保持所有排序号并且支持顺序迭代。然而，有些应用不�
 
 使用基于哈希表的memtable以避免memtable里二分搜索的开销。
 
-给表文件增加哈希索引以避免表文件中二分搜索的开销。对于(2)和(3)的细节，参考[自定义memtable和表工厂](https://rocksdb.org.cn/doc/Basic-Operations.html#memtable-and-table-factories)。请注意，(1)通常已经降低足够的IO了。（2）和（3）可以在某些场景降低CPU开销，并且通常带来一些内存开销。你应该只在CPU为你的瓶颈，并且没有其他更简单的调优手段的时候尝试他们，毕竟这不是通用尝试。确保查看了include/rocksdb/options.h中的关于prefix_extractor的注释。
+给表文件增加哈希索引以避免表文件中二分搜索的开销。对于(2)和(3)的细节，参考[自定义memtable和表工厂](https://wanghenshui.github.io/rocksdb-doc-cn/doc/Basic-Operations.html#memtable-and-table-factories)。请注意，(1)通常已经降低足够的IO了。（2）和（3）可以在某些场景降低CPU开销，并且通常带来一些内存开销。你应该只在CPU为你的瓶颈，并且没有其他更简单的调优手段的时候尝试他们，毕竟这不是通用尝试。确保查看了include/rocksdb/options.h中的关于prefix_extractor的注释。
 
 # Bloom过滤器
 

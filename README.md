@@ -1,103 +1,168 @@
 # rocksdb-doc-cn
 
-这个是rocksdb文档的中文翻译
+rocksdb wiki以及代码分析/每周更新笔记
 
-**严重推荐先阅读[FAQ](doc/RocksDB-FAQ.md)，能解决大部分问题**
+这个是[rocksdb wiki](https://github.com/facebook/rocksdb/wiki) 中文补充版本，结合自己的理解
 
-原文来自[rocksdb wiki](https://github.com/facebook/rocksdb/wiki)
-
-中文部分会更新到[rocksdb中文网/文档](https://rocksdb.org.cn/doc.html)
-
-本翻译没有经过任何校对，so，如果有疑惑，欢迎提issue。如果希望帮助/催更翻译一些没有的章节，同样欢迎提issue。如果你自己翻译好了，提PR什么的也不是不可以。
-
-目前我觉得比较有意思的内容已经翻一下来了，其他内容短时间内不会更新，如果希望看某一个篇章的翻译，请提issue。
 
 # 目录
 
 - [概述](doc/OverView.md)
 - [FAQ](doc/RocksDB-FAQ.md)
-- [术语](doc/Terminology.md) 
-- 开发者指南
-	- [基本操作](doc/Basic-Operations.md)
-		- [迭代器](doc/Iterator.md)
-		- [前缀搜索](doc/Prefix-seek.md)
-		- [向前搜索](doc/SeekForPrev.md)
-		- [尾部迭代器](doc/Tailing-Iterator.md)
-		- [读-修改-写操作符](doc/Merge-Operator.md)
-        - [列族](doc/Column-Families.md)
-        - [创建以及导入SST文件](doc/Creating-and-Ingesting-SST-files.md)
-        - [单删除](doc/Single-Delete.md)
-        - [低优先级写入](doc/Low-Priority-Write.md)
-        - [生存时间(TTL)支持](doc/Time-to-Live.md)
-        - [事务](doc/Transactions.md)
-        - [快照](doc/Snapshot.md)
-        - [范围删除](doc/DeleteRange.md)
-        - [原子落盘](doc/Atomic-flush.md)
-	- 选项
-		- [基础选项以及调优](doc/Setup-Options-and-Basic-Tuning.md)
-		- [选项字符串以及选项Map](doc/Option-String-and-Option-Map.md)
-		- [配置文件](doc/RocksDB-Options-File.md)
-    - [压缩/compression](doc/Compression.md)
-        - [字典压缩](doc/Dictionary-Compression.md)
-    - [IO](doc/IO.md)
-        - [限流器](doc/Rate-Limiter.md)
-        - [直接IO](doc/Direct-IO.md)
-    - [后台错误处理](doc/Background-Error-Handling.md)
-    - [MANIFEST](doc/MANIFEST.md)
-    - [块缓存](doc/Block-Cache.md)
-    - [Memtable](doc/MemTable.md)
-    - [巨型页帧支持](doc/Allocating-Some-Indexes-and-Bloom-Filters-using-Huge-Page-TLB.md)
-    - [WAL日志](doc/Write-Ahead-Log.md)
-        - [WAL日志格式](doc/Write-Ahead-Log-File-Format.md)
-        - [WAL恢复模式](doc/WAL-Recovery-Modes.md)
-    - [写缓冲管理器](doc/Write-Buffer-Manager.md)
-    - [压缩/compaction](doc/Compaction.md)
-        - [leveled-compaction](doc/Leveled-Compaction.md)
-        - [universal-compaction](doc/Universal-Compaction.md)
-        - [FIFO-compaction](doc/FIFO-compaction-style.md)
-        - [手动压缩](doc/Manual-Compaction.md)
-        - [子压缩](doc/Sub-Compaction.md)
-        - [选择Level压缩的文件](doc/Choose-Level-Compaction-Files.md)
-    - [管理磁盘空间](doc/Managing-Disk-Space-Utilization.md)
-    - SST文件格式
-        - [基于块的表格式](doc/Rocksdb-BlockBasedTable-Format.md)
-        - [平表](doc/PlainTable-Format.md)
-        - [bloom过滤器](doc/RocksDB-Bloom-Filter.md)
-        - [数据块哈希索引](doc/Data-Block-Hash-Index.md)
-    - 日志以及监控
-        - [日志](doc/Logger.md)
-        - [统计](doc/Statistics.md)
-        - [压缩统计和数据库状态](doc/Compaction-Stats-and-DB-Status.md)
-        - [性能与IO上下文](doc/Perf-Context-and-IO-Stats-Context.md)
-        - [事件监听器](doc/EventListener.md)
-- 工具/实用助手
-    - [数据管理和访问工具](doc/Administration-and-Data-Access-Tool.md)
-    - [checkpoint](doc/Checkpoints.md)
-    - [如何备份RocksDB](doc/How-to-backup-RocksDB.md)
-- 实现细节
-    - [删除过期文件](doc/Delete-Stale-Files.md)
-    - [分片索引-过滤器](doc/Partitioned-Index-Filters.md)
-    - [写预备事务](doc/WritePrepared-Transactions.md)
-    - [写未预备事务](doc/WriteUnprepared-Transactions.md)
-    - [我们是如何维护存活SST文件的](doc/How-we-keep-track-of-live-SST-files.md)
-    - [优化SST文件索引以获得更好的搜索性能](doc/Indexing-SST-Files-for-Better-Lookup-Performance.md)
-    - [合并运算实现](doc/Merge-Operator-Implementation.md)
-    - [RocksDB修复器](doc/RocksDB-Repairer.md)
-    - [两步提交实现](doc/Two-Phase-Commit-Implementation.md)
-    - [迭代器的实现](doc/Iterator-Implementation.md)
-    - [模拟缓存](doc/Simulation-Cache.md)
-    - [持久化读缓存](doc/Persistent-Read-Cache.md)
+- [术语](doc/Terminology.md)
+- [TODO 开发者指南](doc/Contributor-Guide.md)
+- [基本操作](doc/Basic-Operations.md)
+  - [迭代器](doc/Iterator.md)
+  - [前缀搜索](doc/Prefix-seek.md)
+  - [向前搜索](doc/SeekForPrev.md)
+  - [尾部迭代器](doc/Tailing-Iterator.md)
+  -  Compaction Filter
+  - [读-修改-写操作符](doc/Merge-Operator.md)
+  - [列族](doc/Column-Families.md)
+  - [创建以及导入SST文件](doc/Creating-and-Ingesting-SST-files.md)
+  - [单删除](doc/Single-Delete.md)
+  - [低优先级写入](doc/Low-Priority-Write.md)
+  - [生存时间(TTL)支持](doc/Time-to-Live.md)
+  - [事务](doc/Transactions.md)
+  - [快照](doc/Snapshot.md)
+  - [范围删除](doc/DeleteRange.md)
+  - [原子落盘](doc/Atomic-flush.md)
+  -  Read-only and Secondary instances
+  -  Approximate Size
+  -    User-defined Timestamp
+  -    Wide Columns
+  -    BlobDB
+  -    Online Verification
+- 配置选项
+    - [基础选项以及调优](doc/Setup-Options-and-Basic-Tuning.md)
+    - [选项字符串以及OptionMap](doc/Option-String-and-Option-Map.md)
+    - [配置文件](doc/RocksDB-Options-File.md)
+  - [Memtable](doc/MemTable.md)
+- Journal
+  - [WAL日志](doc/Write-Ahead-Log.md)
+    - [WAL日志格式](doc/Write-Ahead-Log-File-Format.md)
+    - [WAL恢复模式](doc/WAL-Recovery-Modes.md)
+    - WAL Performance
+    - WAL Compression
+  - [MANIFEST](doc/MANIFEST.md)
+  - Track WAL in MANIFEST
+- Cache
+  - [块缓存](doc/Block-Cache.md)
+  - SecondaryCache (Experimental)
+- [写缓冲管理器](doc/Write-Buffer-Manager.md
+- [压缩/compaction](doc/Compaction.md)
+  - [leveled-compaction](doc/Leveled-Compaction.md)
+  - [universal-compaction](doc/Universal-Compaction.md)
+  - [FIFO-compaction](doc/FIFO-compaction-style.md)
+  - [手动压缩](doc/Manual-Compaction.md)
+  - [子压缩](doc/Sub-Compaction.md)
+  - [选择Level压缩的文件](doc/Choose-Level-Compaction-Files.md)
+  - [管理磁盘空间](doc/Managing-Disk-Space-Utilization.md)
+   -  Trivial Move Compaction
+    -  Remote Compaction (Experimental)
+- SST文件格式
+  - [基于块的表格式](doc/Rocksdb-BlockBasedTable-Format.md)
+  - [平表](doc/PlainTable-Format.md)
+  -         CuckooTable Format
+  -  Index Block Format
+  - [bloom过滤器](doc/RocksDB-Bloom-Filter.md)
+  - [数据块哈希索引](doc/Data-Block-Hash-Index.md)
+- [IO](doc/IO.md)
+  - [限流器](doc/Rate-Limiter.md)
+  - [直接IO](doc/Direct-IO.md)
+  -Rate Limiter
+  -SST File Manager
+  -Direct I/O
+- [压缩/compression](doc/Compression.md)
+    - [字典压缩](doc/Dictionary-Compression.md)
+- Full File Checksum and Checksum Handoff
+  -   Background Error Handling
+  -   Huge Page TLB Support 
+- Tiered Storage (Experimental)
+- Logging and Monitoring
+  - [日志](doc/Logger.md)
+  - [统计](doc/Statistics.md)
+  - [压缩统计和数据库状态](doc/Compaction-Stats-and-DB-Status.md)
+  - [性能与IO上下文](doc/Perf-Context-and-IO-Stats-Context.md)
+  - [事件监听器](doc/EventListener.md)
+- Known Issues
+- Tests
+  - Stress Test
+  - Fuzzing
+  - Benchmarking
+- Tools / Utilities
+  - [数据管理和访问工具](doc/Administration-and-Data-Access-Tool.md)
+  - [checkpoint](doc/Checkpoints.md)
+  - [如何备份RocksDB](doc/How-to-backup-RocksDB.md)
+        Administration and Data Access Tool
+        How to Backup RocksDB?
+        Replication Helpers
+        Checkpoints
+        How to persist in-memory RocksDB database
+        Third-party language bindings
+        RocksDB Trace, Replay, Analyzer, and Workload Generation
+        Block cache analysis and simulation tools
+       - IO Tracer and Parser
+- Implementation Details
+  - [删除过期文件](doc/Delete-Stale-Files.md)
+  - [分片索引-过滤器](doc/Partitioned-Index-Filters.md)
+  - [写预备事务](doc/WritePrepared-Transactions.md)
+  - [写未预备事务](doc/WriteUnprepared-Transactions.md)
+  - [我们是如何维护存活SST文件的](doc/How-we-keep-track-of-live-SST-files.md)
+  - [优化SST文件索引以获得更好的搜索性能](doc/Indexing-SST-Files-for-Better-Lookup-Performance.md)
+  - [合并运算实现](doc/Merge-Operator-Implementation.md)
+  - [RocksDB修复器](doc/RocksDB-Repairer.md)
+  - [两步提交实现](doc/Two-Phase-Commit-Implementation.md)
+  - [迭代器的实现](doc/Iterator-Implementation.md)
+  - [模拟缓存](doc/Simulation-Cache.md)
+  - [废弃 持久化读缓存](doc/Persistent-Read-Cache.md)
+       - Write Batch With Index
+       - DeleteRange Implementation
+       - unordered_write
+- Extending RocksDB
+      -  RocksDB Configurable Objects
+       - The Customizable Class
+       - Object Registry
 - RocksJava
-    - [RocksJava基础](doc/RocksJava-Basics.md)
-    - [RocksJava性能测试](doc/RocksJava-Performance-on-Flash-Storage.md)
-- 性能
-    - [RocksDB内存使用](doc/Memory-usage-in-RocksDB.md)
-    - [调优指南](doc/RocksDB-Tuning-Guide.md)
-    - [写失速](doc/Write-Stalls.md)
-    - [使用RocksDB实现队列服务](doc/Implement-Queue-Service-Using-RocksDB.md)
+  - [RocksJava基础](doc/RocksJava-Basics.md)
+  - [RocksJava性能测试](doc/RocksJava-Performance-on-Flash-Storage.md)
+        Logging in RocksJava
+        JNI Debugging
+        RocksJava API TODO
+        Tuning RocksDB from Java
+    Lua
+        Lua CompactionFilter
+- Performance
+  - [RocksDB内存使用](doc/Memory-usage-in-RocksDB.md)
+  - [调优指南](doc/RocksDB-Tuning-Guide.md)
+  - [写失速](doc/Write-Stalls.md)
+  - [使用RocksDB实现队列服务](doc/Implement-Queue-Service-Using-RocksDB.md)
+        Performance Benchmarks
+        In Memory Workload Performance
+        Read-Modify-Write (Merge) Performance
+        Delete A Range Of Keys
+        Pipelined Write
+        MultiGet Performance
+        Speed-Up DB Open
+        Asynchronous IO
+    Projects Being Developed
+    Misc
+        Building on Windows
+        Developing with an IDE
+        Open Projects
+        Talks
+        Publication
+        Features Not in LevelDB
+        How to ask a performance-related question?
+        Articles about Rocks
 
-# TODO
 
-- 部分链接由于没有翻译，所以暂时没有编辑上去
-- 校对。。。
+
+    - 
+
+
+
+
+
+
 

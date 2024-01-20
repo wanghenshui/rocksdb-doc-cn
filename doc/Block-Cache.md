@@ -126,5 +126,5 @@ BLOCK_CACHE_BYTES_READ,
 BLOCK_CACHE_BYTES_WRITE,
 ```
 
-参考[rocksdb内存使用#block-cache](https://rocksdb.org.cn/doc/Memory-usage-in-RocksDB.html#block-cache)
+参考[rocksdb内存使用#block-cache](https://wanghenshui.github.io/rocksdb-doc-cn/doc/Memory-usage-in-RocksDB.html#block-cache)
 

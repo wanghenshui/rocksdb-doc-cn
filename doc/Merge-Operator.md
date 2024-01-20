@@ -523,5 +523,5 @@ MergeOperator接口被设计用于支持抽象并暴露部分关键方法来在R
 
 ## 有用的链接
 
-[合并+压缩实现细节](https://rocksdb.org.cn/doc/Merge-Operator-Implementation.html) 为那些希望了解合并操作符对他们的代码的影响的RocksDb工程师提供。
+[合并+压缩实现细节](https://wanghenshui.github.io/rocksdb-doc-cn/doc/Merge-Operator-Implementation.html) 为那些希望了解合并操作符对他们的代码的影响的RocksDb工程师提供。
 

@@ -28,7 +28,15 @@
 
 **问:RocksDB支持多进程读吗？**
 
-答：RocksDB支持多个进程以只读模式打开rocksDB，可以通过使用DB::OpenForReadOnly()打开数据库。
+答：可以用DB::OpenAsSecondary()，也可以用DB::OpenForReadOnly()，只读
+
+**当有其他线程读写/manualcompact的时候close安全吗？**
+
+不安全，必须等待所有动作完成，请调用CancelAllBackgroundWork加速
+
+**如何安全删掉db，DestroyDB一个没close的正在使用的db可以吗**
+
+先close再destory，没close 就destroy是为定义行为
 
 **问:最大支持的key和value的大小是多少**
 
@@ -60,9 +68,15 @@
 
 答：我们还在开发RocksJava。当然，如果你发现某些功能缺失，你也可以主动提交PR。
 
-**问:谁在用RocksDB**
+**用了options.prefix_extractor，遍历得到了错误的结果，怎么回事？**
 
-答：参考 [Users](https://github.com/facebook/rocksdb/blob/master/USERS.md)
+这是`options.prefix_extractor`的局限，如果用了`options.prefix_extractor`` 就不支持prev SeekToLast了
+
+一个常见的错误用法是配置了`options.prefix_extractor`，然后Seek这个prefix的最后一个然后Prev遍历，这种用法是不支持的
+
+如果你在设置了`options.prefix_extractor`的场景下还想这么用
+
+得指定`ReadOptions.total_order_seek = true`来禁止prefix_extractor
 
 **问:如何正确删除一个DB？我可以直接对活动的DB调用DestoryDB吗？**
 
@@ -90,7 +104,7 @@
 
 **问:RocksDB编译需要的最小gcc版本是多少？**
 
-答：可以使用4.7。但是推荐4.8及以上的。
+答：推荐4.8及以上的。
 
 **问:如何配置RocksDB以使用多个磁盘？**
 
@@ -98,7 +112,7 @@
 - 如果使用RAID，请使用大的stripe size（64kb太小，推荐使用1MB）
 - 考虑把ColumnFamilyOptions::compaction_readahead_size设置到大于2MB以打开压缩预读
 - 如果主要的工作压力是写，可以增加压缩线程以保持磁盘满负载工作。
-- 考虑为压缩打开一步写
+- 考虑为压缩打开异步写
 
 **问:直接拷贝一个打开的RocksDB实例安全吗？**
 
@@ -214,12 +228,16 @@
 
 答：没有，RocksDB没有列。参考 [Column Families](Column-Families.md)了解什么是列族
 
+**我关闭了WAL并且间歇调用DB::Flush()来持久化数据，使用一个CF用起来没啥问题，多个CF也可以这么玩吗**
+
+可以 多个CF记得设置 `option.atomic_flush=true`
+
 **问:RocksDB真的在读的时候无锁吗？**
 
 答：下列情况读请求会需要锁：
 - 读区共享的缓存块。
 - 读取options.max_open_files != -1的表缓存
-- 如果一个读请求发生在一次落盘或者压缩之后，他可能会短暂地持有一俄国全局锁，用于加载最新的LSM树的元数据。
+- 如果一个读请求发生在一次落盘或者压缩之后，他可能会短暂地持有一全局锁，用于加载最新的LSM树的元数据。
 - RocksDB使用的内存分配器（如jmelloc），有时候会加锁。这些锁通常都是很少出现的，并且都有性能保证。
 
 **问:如果我需要更新多个key，我应该用多个Put操作，还是把他们放到一个批量写操作，然后使用Write调用？**
@@ -246,7 +264,7 @@ backup可以把物理的数据库文件移动到其他环境（如HDFS）。back
 
 **问:我应该用哪种压缩风格呢？**
 
-答：从把所有层设置为LZ4（或者Snappy）开始，以得到一个好性能。如果你希望减小数据大小，尝试在最后一层使用Zlib。
+答：从把所有层设置为LZ4（或者Snappy）开始，以得到一个好性能。如果你希望减小数据大小，尝试在最后一层使用ZSTD。
 
 **问:如果没有覆盖或者删除，压缩还有必要吗？**
 
@@ -300,7 +318,7 @@ backup可以把物理的数据库文件移动到其他环境（如HDFS）。back
 
 **问:块缓存的默认大小是多大？**
 
-答：8MB。
+答：8MB。这个值对大部分场景都是不合适的，你得根据业务改成自己想要的
 
 **问:如果我有好几个列族然后在调用DB函数的时候不传列族指针，会发生什么？**
 
@@ -342,4 +360,6 @@ backup可以把物理的数据库文件移动到其他环境（如HDFS）。back
 
 答：我们目前不支持这么做。你可以通过sst_dump来导出数据。
 
+**如果磁盘没空间报错我该怎么办？**
 
+除非用了事务，遇到了2PC sync wal失败，这种场景得重新opendb之外，其他场景，给磁盘腾出空间，就自动恢复了

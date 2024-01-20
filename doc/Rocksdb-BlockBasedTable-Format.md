@@ -38,7 +38,7 @@ size:           varint64
 (3) 一个metaindex块对每个元数据块都有一个对应的入口项，key为meta块的名字，值是一个BlockHandle
 ，指向具体的元数据块。
 
-(4) 一个索引块，对每个数据块有一个对应的入口项，key是一个string，该string >= 该数据块的最后一个key，并且小于下一个数据块的第一个key。值是数据块对应的BlockHandle。如果索引类型(IndexType)是[kTwoLevelIndexSearch](https://rocksdb.org.cn/doc/Partitioned-Index-Filters.html)，这个索引块就是索引分片的第二层索引，例如，每个入口指向另一个索引块，该索引块包含每个数据块的索引。在这种情况下，格式就变成了：
+(4) 一个索引块，对每个数据块有一个对应的入口项，key是一个string，该string >= 该数据块的最后一个key，并且小于下一个数据块的第一个key。值是数据块对应的BlockHandle。如果索引类型(IndexType)是[kTwoLevelIndexSearch](https://wanghenshui.github.io/rocksdb-doc-cn/doc/Partitioned-Index-Filters.html)，这个索引块就是索引分片的第二层索引，例如，每个入口指向另一个索引块，该索引块包含每个数据块的索引。在这种情况下，格式就变成了：
 
 ```
 [index block - 1st level]

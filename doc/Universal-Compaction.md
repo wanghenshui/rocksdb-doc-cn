@@ -255,7 +255,7 @@ size_ratio_trigger = 100 + options.compaction_options_universal.size_ratio / 100
 
 “尝试调度”意思是在一个memtable落盘之后，一次压缩结束之后。有时候会有重复的请求被调度
 
-参考[Universal压缩范例](https://rocksdb.org.cn/doc/Universal-Style-Compaction-Example.html)看排序结果输出在一个通用设定下是什么样的。
+参考[Universal压缩范例](https://wanghenshui.github.io/rocksdb-doc-cn/doc/Universal-Style-Compaction-Example.html)看排序结果输出在一个通用设定下是什么样的。
 
 并行压缩在 options.max_background_compactions > 1 的时候发生。跟其他所有压缩方式一样，并行压缩不会再同一个排序结果中发生。
 
