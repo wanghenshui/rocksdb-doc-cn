@@ -24,6 +24,7 @@ Rocksdb库提供一个持久化的键值存储。键和值都可以是任意二�
 options.error_if_exists = true;
 ```
 
+
 如果你正在从leveldb迁移到rocksdb，你可以使用rocksdb::LevelDBOptions把你的leveldb::Options对象转成rocksdb::Options对象，他有与leveldb::Options一样的功能。
 
 ```cpp

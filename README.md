@@ -2,8 +2,12 @@
 
 rocksdb wiki以及代码分析/每周更新笔记
 
-这个是[rocksdb wiki](https://github.com/facebook/rocksdb/wiki) 中文补充版本，结合自己的理解
+基线版本是 https://github.com/johnzeng/rocksdb-doc-cn
 
+在此表示感谢
+
+
+这个是[rocksdb wiki](https://github.com/facebook/rocksdb/wiki) 中文补充版本，结合自己的理解
 
 # 目录
 
@@ -16,7 +20,7 @@ rocksdb wiki以及代码分析/每周更新笔记
   - [前缀搜索](doc/Prefix-seek.md)
   - [向前搜索](doc/SeekForPrev.md)
   - [尾部迭代器](doc/Tailing-Iterator.md)
-  -  Compaction Filter
+  - Compaction Filter
   - [读-修改-写操作符](doc/Merge-Operator.md)
   - [列族](doc/Column-Families.md)
   - [创建以及导入SST文件](doc/Creating-and-Ingesting-SST-files.md)
@@ -27,16 +31,16 @@ rocksdb wiki以及代码分析/每周更新笔记
   - [快照](doc/Snapshot.md)
   - [范围删除](doc/DeleteRange.md)
   - [原子落盘](doc/Atomic-flush.md)
-  -  Read-only and Secondary instances
-  -  Approximate Size
-  -    User-defined Timestamp
-  -    Wide Columns
-  -    BlobDB
-  -    Online Verification
+  - Read-only and Secondary instances
+  - Approximate Size
+  - User-defined Timestamp
+  - Wide Columns
+  - BlobDB
+  - Online Verification
 - 配置选项
-    - [基础选项以及调优](doc/Setup-Options-and-Basic-Tuning.md)
-    - [选项字符串以及OptionMap](doc/Option-String-and-Option-Map.md)
-    - [配置文件](doc/RocksDB-Options-File.md)
+  - [基础选项以及调优](doc/Setup-Options-and-Basic-Tuning.md)
+  - [选项字符串以及OptionMap](doc/Option-String-and-Option-Map.md)
+  - [配置文件](doc/RocksDB-Options-File.md)
   - [Memtable](doc/MemTable.md)
 - Journal
   - [WAL日志](doc/Write-Ahead-Log.md)
@@ -58,26 +62,26 @@ rocksdb wiki以及代码分析/每周更新笔记
   - [子压缩](doc/Sub-Compaction.md)
   - [选择Level压缩的文件](doc/Choose-Level-Compaction-Files.md)
   - [管理磁盘空间](doc/Managing-Disk-Space-Utilization.md)
-   -  Trivial Move Compaction
-    -  Remote Compaction (Experimental)
+  - Trivial Move Compaction
+  - Remote Compaction (Experimental)
 - SST文件格式
   - [基于块的表格式](doc/Rocksdb-BlockBasedTable-Format.md)
   - [平表](doc/PlainTable-Format.md)
-  -         CuckooTable Format
-  -  Index Block Format
+  - CuckooTable Format
+  - Index Block Format
   - [bloom过滤器](doc/RocksDB-Bloom-Filter.md)
   - [数据块哈希索引](doc/Data-Block-Hash-Index.md)
 - [IO](doc/IO.md)
   - [限流器](doc/Rate-Limiter.md)
   - [直接IO](doc/Direct-IO.md)
-  -Rate Limiter
-  -SST File Manager
-  -Direct I/O
+    -Rate Limiter
+    -SST File Manager
+    -Direct I/O
 - [压缩/compression](doc/Compression.md)
-    - [字典压缩](doc/Dictionary-Compression.md)
+  - [字典压缩](doc/Dictionary-Compression.md)
 - Full File Checksum and Checksum Handoff
-  -   Background Error Handling
-  -   Huge Page TLB Support 
+  - Background Error Handling
+  - Huge Page TLB Support
 - Tiered Storage (Experimental)
 - Logging and Monitoring
   - [日志](doc/Logger.md)
@@ -94,15 +98,15 @@ rocksdb wiki以及代码分析/每周更新笔记
   - [数据管理和访问工具](doc/Administration-and-Data-Access-Tool.md)
   - [checkpoint](doc/Checkpoints.md)
   - [如何备份RocksDB](doc/How-to-backup-RocksDB.md)
-        Administration and Data Access Tool
-        How to Backup RocksDB?
-        Replication Helpers
-        Checkpoints
-        How to persist in-memory RocksDB database
-        Third-party language bindings
-        RocksDB Trace, Replay, Analyzer, and Workload Generation
-        Block cache analysis and simulation tools
-       - IO Tracer and Parser
+    Administration and Data Access Tool
+    How to Backup RocksDB?
+    Replication Helpers
+    Checkpoints
+    How to persist in-memory RocksDB database
+    Third-party language bindings
+    RocksDB Trace, Replay, Analyzer, and Workload Generation
+    Block cache analysis and simulation tools
+    - IO Tracer and Parser
 - Implementation Details
   - [删除过期文件](doc/Delete-Stale-Files.md)
   - [分片索引-过滤器](doc/Partitioned-Index-Filters.md)
@@ -116,53 +120,42 @@ rocksdb wiki以及代码分析/每周更新笔记
   - [迭代器的实现](doc/Iterator-Implementation.md)
   - [模拟缓存](doc/Simulation-Cache.md)
   - [废弃 持久化读缓存](doc/Persistent-Read-Cache.md)
-       - Write Batch With Index
-       - DeleteRange Implementation
-       - unordered_write
+    - Write Batch With Index
+    - DeleteRange Implementation
+    - unordered_write
 - Extending RocksDB
-      -  RocksDB Configurable Objects
-       - The Customizable Class
-       - Object Registry
+  -  RocksDB Configurable Objects
+  - The Customizable Class
+  - Object Registry
 - RocksJava
   - [RocksJava基础](doc/RocksJava-Basics.md)
   - [RocksJava性能测试](doc/RocksJava-Performance-on-Flash-Storage.md)
-        Logging in RocksJava
-        JNI Debugging
-        RocksJava API TODO
-        Tuning RocksDB from Java
+    Logging in RocksJava
+    JNI Debugging
+    RocksJava API TODO
+    Tuning RocksDB from Java
     Lua
-        Lua CompactionFilter
+    Lua CompactionFilter
 - Performance
   - [RocksDB内存使用](doc/Memory-usage-in-RocksDB.md)
   - [调优指南](doc/RocksDB-Tuning-Guide.md)
   - [写失速](doc/Write-Stalls.md)
   - [使用RocksDB实现队列服务](doc/Implement-Queue-Service-Using-RocksDB.md)
-        Performance Benchmarks
-        In Memory Workload Performance
-        Read-Modify-Write (Merge) Performance
-        Delete A Range Of Keys
-        Pipelined Write
-        MultiGet Performance
-        Speed-Up DB Open
-        Asynchronous IO
+    Performance Benchmarks
+    In Memory Workload Performance
+    Read-Modify-Write (Merge) Performance
+    Delete A Range Of Keys
+    Pipelined Write
+    MultiGet Performance
+    Speed-Up DB Open
+    Asynchronous IO
     Projects Being Developed
     Misc
-        Building on Windows
-        Developing with an IDE
-        Open Projects
-        Talks
-        Publication
-        Features Not in LevelDB
-        How to ask a performance-related question?
-        Articles about Rocks
-
-
-
-    - 
-
-
-
-
-
-
-
+    Building on Windows
+    Developing with an IDE
+    Open Projects
+    Talks
+    Publication
+    Features Not in LevelDB
+    How to ask a performance-related question?
+    Articles about Rocks
