@@ -6,8 +6,9 @@ rocksdb wiki以及代码分析/每周更新笔记
 
 在此表示感谢
 
+[rocksdb wiki](https://github.com/facebook/rocksdb/wiki) 中文补充版本，结合自己的理解，注意，不是一比一翻译
 
-这个是[rocksdb wiki](https://github.com/facebook/rocksdb/wiki) 中文补充版本，结合自己的理解
+会有笔者自己的私货，用 引用加上(笔者注)来标记出来，觉得不对可以多多批评
 
 # 目录
 
@@ -124,7 +125,7 @@ rocksdb wiki以及代码分析/每周更新笔记
     - DeleteRange Implementation
     - unordered_write
 - Extending RocksDB
-  -  RocksDB Configurable Objects
+  - RocksDB Configurable Objects
   - The Customizable Class
   - Object Registry
 - RocksJava

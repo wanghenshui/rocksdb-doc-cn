@@ -24,7 +24,6 @@ Rocksdb库提供一个持久化的键值存储。键和值都可以是任意二�
 options.error_if_exists = true;
 ```
 
-
 如果你正在从leveldb迁移到rocksdb，你可以使用rocksdb::LevelDBOptions把你的leveldb::Options对象转成rocksdb::Options对象，他有与leveldb::Options一样的功能。
 
 ```cpp
@@ -65,16 +64,20 @@ RocksDB自动将当前数据库使用的配置保存到数据库目录下的OPTI
 ## 关闭一个数据库
 
 当你使用完这个数据库，有2种方式可以关闭数据库：
+
 1. 只需要删除这个数据库对象，就可以释放资源。但如果在释放资源的过程中出现错误，可能会出现资源丢失的情况。
 2. 调用DB::Close()函数删除数据库对象，DB::Close()函数会返回状态Status，可以通过检查Status来确定关闭过程中是否存在错误。无论是否出现错误，DB::Close()都会释放所有资源。
 
 例如：
+
 ```cpp
   ... 按上面的描述打开数据库 ...
   ... 对这个数据库做一些操作 ...
   delete db;
 ```
+
 或
+
 ```cpp
   ... 按上面的描述打开数据库 ...
   ... 对这个数据库做一些操作 ...
@@ -107,6 +110,41 @@ RocksDB自动将当前数据库使用的配置保存到数据库目录下的OPTI
 
 MultiGet可以用来从数据库读取多个键值。
 
+用法
+
+提前分配好空间
+
+```cpp
+  std::vector<Slice> keys;
+  std::vector<PinnableSlice> values;
+  std::vector<Status> statuses;
+
+  for ... {
+    keys.emplace_back(key);
+  }
+  values.resize(keys.size());
+  statuses.resize(keys.size());
+
+  db->MultiGet(ReadOptions(), cf, keys.size(), keys.data(), values.data(), statuses.data());
+```
+
+或者这么搞也可以
+
+```cpp
+
+  std::vector<ColumnFamilyHandle*> column_families;
+  std::vector<Slice> keys;
+  std::vector<std::string> values;
+
+  for ... {
+    keys.emplace_back(key);
+    column_families.emplace_back(column_family);
+  }
+  values.resize(keys.size());
+
+  std::vector<Status> statuses = db->MultiGet(ReadOptions(), column_families, keys, &values);
+```
+
 更深入地讨论MultiGet的性能，可以参考[MultiGet性能]()。
 
 ## 写入
@@ -133,7 +171,7 @@ WriteBatch保存一个数据库编辑序列，这些批处理的修改会被按�
 
 除了原子操作的优点，WriteBatch还可以通过将大量的单独修改合并到一个批处理，以此加速批量更新。
 
-### 批量写
+### 同步写
 
 rocksdb的写请求默认都是同步的：他在进程把写请求压入操作系统后返回。从操作系统的内存写入之下的持续存储介质的过程是异步的。可以对某个特定的写请求使用sync标识位，使之在数据完全被写入持久化存储介质之前都不会反回。（在Posix系统，可以在写操作返回前，调用fsync或者fdatasync或者msync。）
 
@@ -147,17 +185,27 @@ rocksdb的写请求默认都是同步的：他在进程把写请求压入操作�
 
 通常异步写会比同步写快上千倍。异步写的缺点是机器崩溃的时候可能会造成最后一个更新操作丢失。注意，如果只是写操作的进程崩溃，即使sync标示没有设置为真，也不会造成数据丢失，在他的写操作返回成功前，更新操作会从进程的内存压入操作系统。
 
-异步写通常可以被安全地使用。例如，在加载一大批数据的时候，你可以通过重启批量加载操作来处理由于崩溃导致的数据丢失。一个混合方案是，你可以每隔几个写操作，就使用一次同步写，当崩溃发生的时候，批量导入可以从上一次运行的最后一次同步写那里继续。（同步写可以更新一个标记，用于记录下次重启的时候应该从哪里开始）。
+异步写通常可以被安全地使用。例如，在加载一大批数据的时候，你可以通过重启批量加载操作来处理由于崩溃导致的数据丢失。一个混合方案是，你可以每隔几个写操作，就使用一次同步写，或者定期调用DB::SyncWAL() 当崩溃发生的时候，批量导入可以从上一次运行的最后一次同步写那里继续。（同步写可以更新一个标记，用于记录下次重启的时候应该从哪里开始）。
 
 WriteBatch提供另一个异步写的方案。可以把许多更新打包在一个WriteBatch里面，然后一次性用一个同步写导入数据库。（write_options.sync被设置为真）。同步写的开销会被该批量写的所有写请求均匀分摊。
 
-我们还提供一个办法，在有必要的时候，可以彻底关闭WAL。如果你把write_option.disableWAL设置为true，写操作完全不会写日志，并且在进程崩溃的时候出现数据丢失。
+也可以彻底关闭WAL。如果你把write_option.disableWAL设置为true，写操作完全不会写日志，并且在进程崩溃的时候出现数据丢失。后果自负
+
+> (笔者注) 通常有一种方案，就是上层存在一个复制组
+> rocksdb这层的wal等于双写log了，是多余的。可以省掉
+
+rocksdb默认用fdatasync来刷文件，某些场景比fsync快点(不刷meta)
+
+如果想用fsync，可以指定Options::use_fsync 对于ext3可能丢数据，推荐开着
+
+> (笔者注) 大家的实践基本都是xfs
 
 ## 并发
 
 一个数据库可能同时只能被一个进程打开。RocksDB的实现方式是，从操作系统那里申请一个锁，以此来阻止错误的写操作。在单进程里面，同一个rocksdb::DB对象可以被多个同步线程共享。举个例子，不同的线程可以同时对同一个数据库调用写操作，迭代遍历操作或者Get操作，而且不需要使用额外的同步锁（rocksdb的实现会自动进行同步）。然而其他对象（比如迭代器，WriteBatch）需要额外的同步机制保证线程同步。如果两个线程共同使用这些对象，他们必须使用自己的锁协议保证访问的同步。更多的细节会在公共头文件给出。
 
 ## 合并操作符
+
 合并操作符为 读－修改－写 操作提供高效的支持。更多的接口和实现参考：
 
 - [合并操作符]()
@@ -176,6 +224,7 @@ WriteBatch提供另一个异步写的方案。可以把许多更新打包在一�
   assert(it->status().ok()); // Check for any errors found during the scan
   delete it;
 ```
+
 下面的例子展示如何处理从start到limit左闭右开区间[start, limt)范围内的键值：
 
 ```cpp
@@ -254,6 +303,7 @@ c++字符串和null结束的c风格字符串，都可以简单地转换为slice�
    std::string str = s1.ToString();
    assert(str == std::string("hello"));
 ```
+
 使用Slice的时候要小心，因为需要由调用者来保证外部的字节数组在Slice使用期间存活。比如，下面这个代码就是有bug的：
 
 ```cpp
@@ -269,9 +319,11 @@ c++字符串和null结束的c风格字符串，都可以简单地转换为slice�
 当if声明结束的时候，str会被析构，然后slice存储的数据就消失了。
 
 ## 事务
+
 RocksDB现在支持多操作事务。参考 [事务]()
 
 ## 比较器
+
 前面的例子使用默认的排序函数对键值进行排序，也就是使用字典顺序排列。你也可以在打开数据库的时候使用自定义的比较器。例如，假如每个数据库的键值都是两个数字，然后我们应该按第一个数字排序，如果第一个数字相同，按照第二个数字排序。首先，定义一个合适的rocksdb::Comparator子类，实现下面的规则：
 
 ```cpp
@@ -411,11 +463,11 @@ Options::write_buffer_size选项指定那些还没排序并存入磁盘文件的
 
 参考 [块缓存]()
 
-## 键分布
+## key布局
 
 注意，缓存与磁盘交换数据的单位是块。连续的键（根据数据库的排序）通常被放在同一个块。所以应用也可以通过把常常一起使用的键放在一起，然后把另一些不常用的放在另一个命名空间，以此提高性能。
 
-例如，加入我们机遇rocksdb开发一个简单的文件系统。每个节点的类型可能这样存储：
+例如，假如我们基于rocksdb开发一个简单的文件系统。每个节点的类型可能这样存储：
 
 ```
    filename -> permission-bits, length, list of file_block_ids
@@ -426,6 +478,7 @@ Options::write_buffer_size选项指定那些还没排序并存入磁盘文件的
 我们可能希望给filename这个键使用一个前缀（例如'/'），然后给file_block_id使用另一个前缀（例如'0'），这样，扫描元数据的时候就不用关心大量的文件内容信息了。
 
 ## 过滤器
+
 由于Rocksdb在硬盘的数据组织方式，一个Get请求可能会导致多个磁盘读请求。这个时候，FilterPolicy机制就可以用来非常可观地减少磁盘读。
 
 ```cpp
@@ -472,6 +525,7 @@ Options::write_buffer_size选项指定那些还没排序并存入磁盘文件的
     }
   };
 ```
+
 上面的应用提供一个不是使用bloom filter的过滤策略，而是使用其他的策略来提取一个键值集合的值。参考rocksdb/filter_policy.h
 
 ## 校验和
@@ -480,6 +534,8 @@ rocksdb会给所有存储在文件系统的数据添加校验和。有两个独�
 
 - ReadOptions::verify_checksums 强制要求某个读请求对所有的从硬盘读的数据都要检查校验和。这个是默认开的。
 - Options::paranoid_checks 如果在打开数据库的时候被设置为了true，那么数据库的实现就会在他检测到校验和错误的时候返回一个错误。根据数据库具体出错的部位，这个错误可能在数据库打开的时候就反回，也可能在后续的其它操作反回。默认paranoid_checks为false，这样即使部分持久化数据出错，DB也还可以继续运作。
+
+也可以通过DB::VerifyChecksum()手动进行校验
 
 如果db崩溃了（比如paranoid_checks为true时打开失败了），rocksdb::RepairDB方法**可能**可以用来尽可能地恢复数据。
 
@@ -551,4 +607,3 @@ rocksdb可以通过实现rocksdb/port/port.h导出的类型/方法/函数，来�
 - [RocksDB概述与架构]()
 - [不可修改Table文件的格式]()
 - [log文件格式]()
-

@@ -1,7 +1,159 @@
-# 前缀搜索接口
+# 前缀查询 prefix seek
+
+## 为什么要有前缀查询
+
+典型场景就是二级索引，myrocks，这种key有公共前缀，用prefix bloom filter来构建一个索引，这样搜索减少IO次数
+
+如果iterator遍历的少，prefix seek效率高，否则和正常seek遍历没区别了。
+
+> （笔者注） redis hash结构 都有公共前缀key ，所以可以构建key的 bloom filter，减少IO过滤
+> IO大头，定位的IO和遍历的IO比还是实际遍历更消耗一些
+
+## 定义一个prefix
+
+通过options.prefix_extractor设置
+
+文中的prefix等于 options.prefix_extractor.Transform()
+
+有几个helper 比如NewFixedPrefixTransform NewCappedPrefixTransform，当然也可以定义一个自己的
+
+如果定义了prefix_extractor， comparator也得改，需要判定相同前缀的order
+
+通常推荐NewCappedPrefixTransform，comparator只要bytewise就可以了，性能表现也好大部分特性表现没区别
+
+> 笔者注：默认BytewiseComparator
 
 如果你的DB或者列族的options.prefix_extractor选项有被声明，那么rocksdb就会在一个“前缀搜索”模式，具体会在下面解释。使用的例子如下：
 
+
+## 配置 prefix bloom filter
+
+```cpp
+
+Options options;
+
+// Set up bloom filter
+rocksdb::BlockBasedTableOptions table_options;
+table_options.filter_policy.reset(rocksdb::NewBloomFilterPolicy(10, false));
+table_options.whole_key_filtering = false;  // 笔者注:这个默认是true的，针对Get()的优化,注意
+options.table_factory.reset(
+    rocksdb::NewBlockBasedTableFactory(table_options));  // For multiple column family setting, set up specific column family's ColumnFamilyOptions.table_factory instead.
+
+// Define a prefix. In this way, a fixed length prefix extractor. A recommended one to use.
+options.prefix_extractor.reset(NewCappedPrefixTransform(3));
+
+DB* db;
+Status s = DB::Open(options, "/tmp/rocksdb",  &db);
+```
+
+## 怎么读
+
+### 忽略prefix bloom filter
+
+```cpp
+ReadOptions read_options;
+read_options.total_order_seek = true;
+Iterator* iter = db->NewIterator(read_options);
+Slice key = "foobar";
+iter->Seek(key);  // Seek "foobar" in total order
+```
+
+如果不设置total order，这种场景默认是prefix seek
+
+如果搜不到prefix，结果可能是错的，避免这种场景，设置total order seek，相当于忽略bloom filter
+
+> 笔者注：一个弊端 快，但结果是错的，对，但结果很慢
+
+### 自动模式
+
+```cpp
+
+ReadOptions read_options;
+read_options.auto_prefix_mode = true;
+Iterator* iter = db->NewIterator(read_options);
+// ......
+```
+设置auto_prefix_mode可以保证能用prefix bloom filter就用，不能用就自动total order
+
+6.8版本引入
+
+一个例子
+
+```cpp
+
+options.prefix_extractor.reset(NewCappedPrefixTransform(3));
+options.comparator = BytewiseComparator();  // This is the default
+// ......
+ReadOptions read_options;
+read_options.auto_prefix_mode = true;
+std::string upper_bound;
+Slice upper_bound_slice;
+
+// "foo2" and "foo9" share the same prefix "foo".
+upper_bound = "foo9";
+upper_bound_slice = Slice(upper_bound);
+read_options.iterate_upper_bound = &upper_bound_slice;
+Iterator* iter = db->NewIterator(read_options);
+iter->Seek("foo2");
+
+// "foobar2" and "foobar9" share longer prefix than "foo".
+upper_bound = "foobar9";
+upper_bound_slice = Slice(upper_bound);
+read_options.iterate_upper_bound = &upper_bound_slice;
+Iterator* iter = db->NewIterator(read_options);
+iter->Seek("foobar2");
+
+// "foo2" and "fop" doesn't share the same prefix, but "fop" is the successor key of prefix "foo" which is the prefix of "foo2".
+upper_bound = "fop";
+upper_bound_slice = Slice(upper_bound);
+read_options.iterate_upper_bound = &upper_bound_slice;
+Iterator* iter = db->NewIterator(read_options);
+iter->Seek("foo2");
+```
+
+这种用法的局限性
+- 比如NewFixedPrefixTransform 或者 比如NewFixedPrefixTransform
+- 必须实现IsSameLengthImmediateSuccessor确定order，默认的BytewiseComparator是实现了的
+- 目前只有Seek能用这个能力，SeekForPrev遍历不用bloom filter，你问为什么？用不着就没实现，想用可以共建
+- 检查bloom filter有CPU开销
+
+### 手动前缀遍历
+
+```cpp
+options.prefix_extractor.reset(NewCappedPrefixTransform(3));
+
+ReadOptions read_options;
+read_options.total_order_seek = false;
+read_options.auto_prefix_mode = false;
+Iterator* iter = db->NewIterator(read_options);
+
+iter->Seek("foobar");
+// Iterate within prefix "foo"
+
+iter->SeekForPrev("foobar");
+// iterate within prefix "foo"
+```
+
+可能存在的问题
+- 可能删除的key重新被遍历到
+- key顺序有问题
+
+这个模式是最早引入到，为了保留兼容性，还留着，但是别用
+
+## 修改 prefix extractor
+
+文件中会有prefix extractor名字信息，如果不同就不使用新的prefix extractor，走total order seek模式
+
+除非之前用的是内置的两个 NewFixedPrefixTransform NewFixedPrefixTransform，会走 auto_prefix_mode模式
+
+## 其他前缀遍历特性
+
+- prefix bloom filter设置memtable上开启 options.memtable_prefix_bloom_size_ratio
+- Prefix hash index 看 https://github.com/facebook/rocksdb/wiki/Data-Block-Hash-Index
+- PlainTable format 看 https://github.com/facebook/rocksdb/wiki/PlainTable-Format
+
+
+## 通用API(旧文档)
 ```cpp
 Options options;
 
@@ -57,9 +209,9 @@ iter->Seek(key);  // Seek "foobar" in total order
 ```
 这个模式下，性能可能会变差。请注意，并不是所有的前缀搜索实现都支持这个功能。例如，平表的实现就不支持，所以如果你尝试这么使用，你会看到一个错误码返回。基于哈希的mentable会在使用这个功能的时候做一次昂贵的在线排序。prefix bloom和使用哈希索引的基于块的表是支持这个模式的。
 
-## 限制
+## 局限
 
-SeekToLast对前缀索引不友好。SeekToFirst只对部分配置有支持。如果你的迭代器需要使用这两个操作，你应该使用全排序模式。
+SeekToLast不支持。SeekToFirst只对部分配置有支持。如果你的迭代器需要使用这两个操作，你应该使用全排序模式。
 
 一个常见的使用前缀索引的bug是使用逆序迭代前缀模式。这个还没有支持。如果你需要经常使用逆序迭代，你可以重新对数据进行排序，然后把前缀迭代器的顺序反过来。你可以通过自己实现一个比较器，或者使用其他方法编码你的key
 
