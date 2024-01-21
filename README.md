@@ -10,17 +10,17 @@ rocksdb wiki以及代码分析/一些周边更新
 
 具体流程
 
-- 关注rocksdb 
+- 关注rocksdb
   - pebbles 不看了，不懂go，也看不过来
   - speedb通常都是上游跟进，修bug
 - 平常就翻译总结已有的rocksdb wiki，丰富文档，目前的wiki是5的，很多新改动没跟进
 - 每周的git提交 tig --since=2024-01-01 .
-- 每周的issue
-- 每周的邮件组邮件
-- speedb discord信息
+- speedb discord信息, 有很多信息转发
+  - 每周的邮件组邮件
+  - 每周的issue
+  - SO
 - blog/论文动态/源码分析，有人更就贴一下
   - 重点关注/复现mark的博客，最近也在做
-
 
 基线版本是 https://github.com/johnzeng/rocksdb-doc-cn, 在此表示感谢
 
@@ -124,11 +124,11 @@ rocksdb wiki以及代码分析/一些周边更新
   - [checkpoint](doc/Checkpoints.md)
   - [如何备份RocksDB](doc/How-to-backup-RocksDB.md)
   - Administration and Data Access Tool
-  -  Replication Helpers
-  -   Checkpoints
-  -    How to persist in-memory RocksDB database
-  -     RocksDB Trace, Replay, Analyzer, and Workload Generation
-  -     Block cache analysis and simulation tools
+  - Replication Helpers
+  - Checkpoints
+  - How to persist in-memory RocksDB database
+  - RocksDB Trace, Replay, Analyzer, and Workload Generation
+  - Block cache analysis and simulation tools
   - IO Tracer and Parser
 - Implementation Details
   - [删除过期文件](doc/Delete-Stale-Files.md)
@@ -171,13 +171,13 @@ rocksdb wiki以及代码分析/一些周边更新
   - Pipelined Write
   - MultiGet Performance
   - Speed-Up DB Open
-  -  Asynchronous IO
-  -   Projects Being Developed
-  -    Misc
-  -    Building on Windows
-  -    Developing with an IDE
-  -     Open Projects
-  -  Talks
-  -  Publication
+  - Asynchronous IO
+  - Projects Being Developed
+  - Misc
+  - Building on Windows
+  - Developing with an IDE
+  - Open Projects
+  - Talks
+  - Publication
   - How to ask a performance-related question?
   - Articles about Rocks
