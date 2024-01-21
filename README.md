@@ -1,36 +1,62 @@
-# rocksdb-doc-cn
+# rocksdb-updates-cn
 
-rocksdb wiki以及代码分析/每周更新笔记
+rocksdb wiki以及代码分析/一些周边更新
 
-基线版本是 https://github.com/johnzeng/rocksdb-doc-cn
+看到 [Reflections on ten years of LLVM Weekly](https://muxup.com/2024q1/reflections-on-ten-years-of-llvm-weekly)更新了十年
 
-在此表示感谢
+感想很多，上次面试被攻击了rocksdb水平很低，很受打击！
 
-[rocksdb wiki](https://github.com/facebook/rocksdb/wiki) 中文补充版本，结合自己的理解，注意，不是一比一翻译
+准备关注 rocksdb/speedb/pebbles等 google group邮件等更新，每周看一圈，总结更新！
+
+具体流程
+
+- 关注rocksdb 
+  - pebbles 不看了，不懂go，也看不过来
+  - speedb通常都是上游跟进，修bug
+- 平常就翻译总结已有的rocksdb wiki，丰富文档，目前的wiki是5的，很多新改动没跟进
+- 每周的git提交 tig --since=2024-01-01 .
+- 每周的issue
+- 每周的邮件组邮件
+- speedb discord信息
+- blog/论文动态/源码分析，有人更就贴一下
+  - 重点关注/复现mark的博客，最近也在做
+
+
+基线版本是 https://github.com/johnzeng/rocksdb-doc-cn, 在此表示感谢
+
+注意，不是一比一翻译
 
 会有笔者自己的私货，用 引用加上(笔者注)来标记出来，觉得不对可以多多批评
 
-# 目录
+一些常见的词语，没有翻译
+
+# 每周代码更新
+
+- [2024-01-21](commit/2024-01-21.md)
+
+# 每周社区问题讨论
+
+# Wiki目录
 
 - [概述](doc/OverView.md)
 - [FAQ](doc/RocksDB-FAQ.md)
 - [术语](doc/Terminology.md)
-- [TODO 开发者指南](doc/Contributor-Guide.md)
+- [开发者指南](doc/Contributor-Guide.md)
 - [基本操作](doc/Basic-Operations.md)
   - [迭代器](doc/Iterator.md)
   - [前缀搜索](doc/Prefix-seek.md)
   - [向前搜索](doc/SeekForPrev.md)
   - [尾部迭代器](doc/Tailing-Iterator.md)
   - [Compaction Filter](doc/Compaction-Filter.md)
-  - [读-修改-写操作符](doc/Merge-Operator.md)
-  - [列族](doc/Column-Families.md)
+  - [Merge 读-修改-写操作符](doc/Merge-Operator.md)
+  - [Column Family](doc/Column-Families.md)
   - [创建以及导入SST文件](doc/Creating-and-Ingesting-SST-files.md)
-  - [单删除](doc/Single-Delete.md)
+  - [Single Delete](doc/Single-Delete.md)
   - [低优先级写入](doc/Low-Priority-Write.md)
   - [生存时间(TTL)支持](doc/Time-to-Live.md)
   - [事务](doc/Transactions.md)
   - [快照](doc/Snapshot.md)
-  - [范围删除](doc/DeleteRange.md)
+  - [DeleteRange](doc/DeleteRange.md)
   - [原子落盘](doc/Atomic-flush.md)
   - Read-only and Secondary instances
   - Approximate Size
@@ -75,9 +101,7 @@ rocksdb wiki以及代码分析/每周更新笔记
 - [IO](doc/IO.md)
   - [限流器](doc/Rate-Limiter.md)
   - [直接IO](doc/Direct-IO.md)
-    -Rate Limiter
-    -SST File Manager
-    -Direct I/O
+  - SST File Manager
 - [压缩/compression](doc/Compression.md)
   - [字典压缩](doc/Dictionary-Compression.md)
 - Full File Checksum and Checksum Handoff
@@ -99,15 +123,13 @@ rocksdb wiki以及代码分析/每周更新笔记
   - [数据管理和访问工具](doc/Administration-and-Data-Access-Tool.md)
   - [checkpoint](doc/Checkpoints.md)
   - [如何备份RocksDB](doc/How-to-backup-RocksDB.md)
-    Administration and Data Access Tool
-    How to Backup RocksDB?
-    Replication Helpers
-    Checkpoints
-    How to persist in-memory RocksDB database
-    Third-party language bindings
-    RocksDB Trace, Replay, Analyzer, and Workload Generation
-    Block cache analysis and simulation tools
-    - IO Tracer and Parser
+  - Administration and Data Access Tool
+  -  Replication Helpers
+  -   Checkpoints
+  -    How to persist in-memory RocksDB database
+  -     RocksDB Trace, Replay, Analyzer, and Workload Generation
+  -     Block cache analysis and simulation tools
+  - IO Tracer and Parser
 - Implementation Details
   - [删除过期文件](doc/Delete-Stale-Files.md)
   - [分片索引-过滤器](doc/Partitioned-Index-Filters.md)
@@ -131,32 +153,31 @@ rocksdb wiki以及代码分析/每周更新笔记
 - RocksJava
   - [RocksJava基础](doc/RocksJava-Basics.md)
   - [RocksJava性能测试](doc/RocksJava-Performance-on-Flash-Storage.md)
-    Logging in RocksJava
-    JNI Debugging
-    RocksJava API TODO
-    Tuning RocksDB from Java
-    Lua
-    Lua CompactionFilter
+  - Logging in RocksJava
+  - JNI Debugging
+  - RocksJava API TODO
+  - Tuning RocksDB from Java
+  - Lua
+  - Lua CompactionFilter
 - Performance
   - [RocksDB内存使用](doc/Memory-usage-in-RocksDB.md)
   - [调优指南](doc/RocksDB-Tuning-Guide.md)
   - [写失速](doc/Write-Stalls.md)
   - [使用RocksDB实现队列服务](doc/Implement-Queue-Service-Using-RocksDB.md)
-    Performance Benchmarks
-    In Memory Workload Performance
-    Read-Modify-Write (Merge) Performance
-    Delete A Range Of Keys
-    Pipelined Write
-    MultiGet Performance
-    Speed-Up DB Open
-    Asynchronous IO
-    Projects Being Developed
-    Misc
-    Building on Windows
-    Developing with an IDE
-    Open Projects
-    Talks
-    Publication
-    Features Not in LevelDB
-    How to ask a performance-related question?
-    Articles about Rocks
+  - Performance Benchmarks
+  - In Memory Workload Performance
+  - Read-Modify-Write (Merge) Performance
+  - Delete A Range Of Keys
+  - Pipelined Write
+  - MultiGet Performance
+  - Speed-Up DB Open
+  -  Asynchronous IO
+  -   Projects Being Developed
+  -    Misc
+  -    Building on Windows
+  -    Developing with an IDE
+  -     Open Projects
+  -  Talks
+  -  Publication
+  - How to ask a performance-related question?
+  - Articles about Rocks
