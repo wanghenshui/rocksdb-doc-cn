@@ -83,7 +83,7 @@ Transaction对象会需要追踪已经写入到db的未预备事务的列表。�
 
 这个实现在 存在线上快照能看到prep_seq的时候，是不能工作的。因为如果max_evicted_seq增加到prep_seq之上了，我们会有 `prep_seq < max_evicted_seq < snaphot_seq < rollback_seq`。这时候，正在序列号snapshot_seq上读取的快照会假设在prep_seq的数据已经被提交了，因为`prep_seq < max_evicted_seq`且在old_commit_map里面没有记录
 
-这个缺点在WritePreparedTxn中可以容忍，因为Mysql只会在恢复的时候回滚准备好的事务，此时不会有存活快照，因此不会有这个不一致问题。然而，在WriteUnpreparedTxn，这个场景不止发生在恢复阶段，同事会发生在用户发起的未预备事务的回滚上。
+这个缺点在WritePreparedTxn中可以容忍，因为Mysql只会在恢复的时候回滚准备好的事务，此时不会有存活快照，因此不会有这个不一致问题。然而，在WriteUnpreparedTxn，这个场景不止发生在恢复阶段，同时会发生在用户发起的未预备事务的回滚上。
 
 我们通过写入一个回滚标记解决这个问题，在放弃的事务后追加回滚数据，然后在提交映射里提交事务。因为事务后面追加了回滚数据，尽管被提交了，但是他不会修改数据库的状态，因此他被有效地回滚了。如果max_evicted_seq增加到超过prep_seq了，由于<prep_seq, commit_seq>被加入到CommitCache，已有路径，比如，增加淘汰项到old_commit_map，会处理存活的，满足`prep_seq < snapshot_seq < commit_seq`的快照。如果他在回滚过程中崩溃，在恢复的时候，他读取回滚标记，然后完成回滚操作。
 

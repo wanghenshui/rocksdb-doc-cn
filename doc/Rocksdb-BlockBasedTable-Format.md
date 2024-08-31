@@ -48,7 +48,7 @@ size:           varint64
 [index block - 2nd level]
 ```
 
-(5) 在文件的最后的最后，有一个定长的脚注，包含metaindex以及索引块的BlockHandle，同事还有一个魔数：
+(5) 在文件的最后的最后，有一个定长的脚注，包含metaindex以及索引块的BlockHandle，同时还有一个魔数：
 
 ```
    metaindex_handle: char[p];      // metaindex的Block handle

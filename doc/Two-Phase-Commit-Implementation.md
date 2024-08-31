@@ -90,7 +90,7 @@ TransactionDB修改
 
 为了使用事务，用户必须打开一个TransactionDB。这个TransactionDB实例之后被用于构造Transaction。这个TransactionDB现在记录一个XID到所有已经创建的两阶段提交事务的映射。当一个事务被删除或者回滚，他从映射中被删除。同时有一个API用于查询所有准备好的事务。这个在MyRocks恢复的时候被使用。
 
-TransactionDB同事还追踪一个所有包含准备段的日志号码的最小堆。当一个事务是'准备好'，他的WriteBatch会被写入一个日志，这个日志号会被存储在事务对象以及他的最小堆。当一个事务提交，他的日志号码会从小顶堆中删除，但是他不会被遗忘！现在需要memtable记录他需要的最老日志，直到他被落盘到L0。
+TransactionDB同时还追踪一个所有包含准备段的日志号码的最小堆。当一个事务是'准备好'，他的WriteBatch会被写入一个日志，这个日志号会被存储在事务对象以及他的最小堆。当一个事务提交，他的日志号码会从小顶堆中删除，但是他不会被遗忘！现在需要memtable记录他需要的最老日志，直到他被落盘到L0。
 
 # 写流程的修改
 
@@ -189,7 +189,7 @@ WriteBatchInternal::InsertInto可能会被修改为只迭代没有Transaction的
 
 我们同时必须考虑在TransactionDB中已经准备好的段的堆的最小值。这代表了包含一个准备段但是没有提交的最早的日志。
 
-我们同事必须考虑所有Memtable以及还没有落盘的ImmutableMemTables引用的准备段日志的最小值。
+我们同时必须考虑所有Memtable以及还没有落盘的ImmutableMemTables引用的准备段日志的最小值。
 
 上面三个的最小值就是最早的还持有没有刷入L0的数据的日志。
 

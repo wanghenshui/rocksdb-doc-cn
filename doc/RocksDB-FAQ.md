@@ -160,7 +160,7 @@
 
 **问:使用了options.prefix_extrator之后，我有时会看到错误的结果。哪里出错了呢？**
 
-答：options.extrator有一些限制。如果使用前缀迭代器，那么他将不支持Prev()或者SeekToLast()，很多操作还不支持SeekToFirst()。一个常见的错误是通过Seek和Prev来找一个前缀的最后一个键。这是不支持的。目前没法通过前缀迭代器来拿到某个前缀的最后一个键。同事，如果所有prefix都查完了，你不能继续迭代这些键。如果你确实需要这些操作，你可以试着将ReadOptions.total_order_seek设置为true来关闭前缀迭代。
+答：options.extrator有一些限制。如果使用前缀迭代器，那么他将不支持Prev()或者SeekToLast()，很多操作还不支持SeekToFirst()。一个常见的错误是通过Seek和Prev来找一个前缀的最后一个键。这是不支持的。目前没法通过前缀迭代器来拿到某个前缀的最后一个键。同时，如果所有prefix都查完了，你不能继续迭代这些键。如果你确实需要这些操作，你可以试着将ReadOptions.total_order_seek设置为true来关闭前缀迭代。
 
 **问:一个迭代器需要持有多少资源，这些资源会在什么时候被释放？**
 

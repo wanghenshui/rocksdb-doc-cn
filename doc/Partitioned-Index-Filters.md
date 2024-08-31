@@ -90,7 +90,7 @@ RocksDB默认对每个SST文件有一个索引/过滤器块。根据配置的不
 [index block - top-level index]
 ```
 
-然后SST的脚注指向顶级索引块（他自身就是一个索引分片块的索引）。每个独立的索引块分片遵从与kBinarySearch相同的格式。顶级索引格式同事遵从kBinarySearch，因此可以使用普通的数据块读取器来读取。
+然后SST的脚注指向顶级索引块（他自身就是一个索引分片块的索引）。每个独立的索引块分片遵从与kBinarySearch相同的格式。顶级索引格式同时遵从kBinarySearch，因此可以使用普通的数据块读取器来读取。
 
 类似的结果被用于过滤器块分片。每个独立的过滤器块的格式遵从kFullFilter的格式。顶级索引格式遵从kBinarySearch的格式，类似索引块的顶级索引。
 
